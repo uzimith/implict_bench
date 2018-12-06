@@ -1,0 +1,40 @@
+### https://raw.github.com/github/gitignore/ed91cc6c01cb044505585b8aa77d8e017bffece7/Scala.gitignore
+
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.ensime
+.ensime_cache/
+.scala_dependencies
+.worksheet
+
+# ENSIME specific
+.ensime_cache/
+.ensime
+
+
+### https://raw.github.com/github/gitignore/ed91cc6c01cb044505585b8aa77d8e017bffece7/Global/sbt.gitignore
+
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+target/
+lib_managed/
+src_managed/
+project/boot/
+.history
+.cache
+
+

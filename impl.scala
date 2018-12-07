@@ -1,30 +1,48 @@
 package impl
 
+import shapeless.labelled.FieldType
+import shapeless.{LabelledGeneric, Poly1}
+import shapeless.ops.record.Keys
+
+case class User(name: String, age: Int)
+
 object Main extends App {
-  def mapMeth(x: Int): Seq[Int] = {
-    1.to(x).map(x => x.*(2))
+  def refrection(): Unit = {
+    def toJSONString(elem: Any): String = elem match {
+      case elem: Int    => s"${elem}"
+      case elem: String => s""""${elem}""""
+    }
+
+    val user = User("scalaちゃん", 18)
+    val fields = user.getClass.getDeclaredFields.map(_.getName)
+    val values = user.productIterator.toList.map(toJSONString)
+
+    val json = fields
+      .zip(values)
+      .map {
+        case (field, value) => s"${field}: ${value}"
+      }
+      .mkString("{", ", ", "}")
+
+    println(json)
   }
 
-  def forMeth(x: Int): Seq[Int] = {
-    for {
-      a <- 1 to x
-    } yield {
-      a.*(2)
+  def shapeless(): Unit = {
+    object toJSONString extends Poly1 {
+      implicit val atInt = at[FieldType[Symbol, Int]](elem => s"${elem}")
+      implicit val atString =
+        at[FieldType[Symbol, String]](elem => """"${elem}"""")
     }
+
+    val genUser = LabelledGeneric[User]
+    val fields =
+      Keys[genUser.Repr].apply.toList[Symbol].map(_.name)
+    val values =
+      genUser.to(User("scalaちゃん", 18)).map(toJSONString)
+    println(fields)
+    println(values)
   }
 
-  def nestForMeth(x: Int): Seq[Int] = {
-    for {
-      a <- 1 to x
-      b <- 1 to a
-    } yield {
-      a + b
-    }
-  }
-
-  def flatMapMeth(x: Int): Seq[Int] = {
-    1.to(x).flatMap { a =>
-      (1 to a).map(b => a + b)
-    }
-  }
+  refrection()
+  shapeless()
 }

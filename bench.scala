@@ -1,11 +1,31 @@
 package bench
 
 import org.openjdk.jmh.annotations._
-import impl.Main
+import impl.Impl._
 
 @BenchmarkMode(Array(Mode.Throughput))
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 3, time = 1)
+@Warmup(iterations = 20, time = 1)
+@Measurement(iterations = 20, time = 1)
 @Fork(1)
 class Bench {
+
+  @Benchmark
+  def benchNoBottleneck(): Unit = {
+    noBottleneck()
+  }
+
+  @Benchmark
+  def benchReflection(): Unit = {
+    refrection()
+  }
+
+  @Benchmark
+  def benchShapeless(): Unit = {
+    shapeless()
+  }
+
+  @Benchmark
+  def benchCirce(): Unit = {
+    circe()
+  }
 }

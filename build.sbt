@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
   "org.json4s" %% "json4s-native" % "3.6.2",
   "io.circe" %% "circe-core" % "0.10.0",
   "io.circe" %% "circe-generic" % "0.10.0",
-  "io.circe" %% "circe-parser" % "0.10.0"
+  "io.circe" %% "circe-parser" % "0.10.0",
+  "com.lihaoyi" %% "pprint" % "0.5.3"
 )

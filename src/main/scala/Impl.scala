@@ -32,43 +32,49 @@ object Impl {
     }
   }
 
-  object toJSONStringPoly extends Poly1 {
-    implicit def atInt[K] =
-      at[FieldType[K, Int]](elem => field[K](s"${elem}"))
-    implicit def atBoolean[K] =
-      at[FieldType[K, Boolean]](elem => field[K](s"${elem}"))
-    implicit def atString[K] =
-      at[FieldType[K, String]](elem => field[K](s""""${elem}""""))
-    implicit def atUser[K] =
-      at[FieldType[K, User]](elem => field[K](s""""${elem}""""))
-  }
-
   def reflection(elem: Post): String = {
     Func.toJSONString(elem)
+  }
+
+  object JSONString extends Poly1 {
+    implicit def atInt[K] =
+      at[FieldType[K, Int]](elem => s"${elem}")
+    implicit def atBoolean[K] =
+      at[FieldType[K, Boolean]](elem => s"${elem}")
+    implicit def atString[K] =
+      at[FieldType[K, String]](elem => s""""${elem}"""")
+    implicit def atUser[K] =
+      at[FieldType[K, User]](elem => s"${shapeless(elem)}")
   }
 
   object symbolName extends Poly1 {
     implicit def atTaggedSymbol[T] = at[Symbol with Tagged[T]](_.name)
   }
 
-  def shapeless[T, Repr <: HList, KeysRepr <: HList, MapperRepr <: HList](
-      elem: T)(implicit gen: LabelledGeneric.Aux[T, Repr],
-               keys: Keys.Aux[Repr, KeysRepr],
-               mapper: Mapper.Aux[symbolName.type, KeysRepr, MapperRepr],
-               traversable: ToTraversable.Aux[MapperRepr, List, String]) {
-    val fields = keys().map(symbolName).toList.toSeq
-    println(fields)
-//    val values = gen
-//      .to(elem)
-//      .map(toJSONStringPoly)
-//      .toList
-//
-//    fields
-//      .zip(values)
-//      .map {
-//        case (field, value) => s""""${field}":${value}"""
-//      }
-//      .mkString("{", ",", "}")
+  def shapeless[T,
+                Repr <: HList,
+                KeysRepr <: HList,
+                KeyMapperRepr <: HList,
+                ValueMapperRepr <: HList](elem: T)(
+      implicit gen: LabelledGeneric.Aux[T, Repr],
+      keys: Keys.Aux[Repr, KeysRepr],
+      keyMapper: Mapper.Aux[symbolName.type, KeysRepr, KeyMapperRepr],
+      valueMapper: Mapper.Aux[JSONString.type, Repr, ValueMapperRepr],
+      keyTraversable: ToTraversable.Aux[KeyMapperRepr, List, String],
+      valueTraversable: ToTraversable.Aux[ValueMapperRepr, List, String])
+    : String = {
+    val fields = keys().map(symbolName).toList
+    val values = gen
+      .to(elem)
+      .map(JSONString)
+      .toList
+
+    fields
+      .zip(values)
+      .map {
+        case (field, value) => s""""${field}":${value}"""
+      }
+      .mkString("{", ",", "}")
   }
 
 //  def shapelessAny[A](elem: A): String = {
